@@ -1,0 +1,9 @@
+/.bundle/
+/.yardoc
+/Gemfile.lock
+/coverage/
+/doc/
+/vendor/
+.byebug_history
+.ruby-version
+cutoff-*.gem
