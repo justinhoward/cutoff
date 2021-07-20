@@ -4,6 +4,7 @@ Cutoff
 [![Gem Version](https://badge.fury.io/rb/cutoff.svg)](https://badge.fury.io/rb/cutoff)
 [![CI](https://github.com/justinhoward/cutoff/workflows/CI/badge.svg)](https://github.com/justinhoward/cutoff/actions?query=workflow%3ACI+branch%3Amaster)
 [![Code Quality](https://app.codacy.com/project/badge/Grade/2748da79ec294f909996a56f11caac4a)](https://www.codacy.com/gh/justinhoward/cutoff/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=justinhoward/cutoff&amp;utm_campaign=Badge_Grade)
+[![Code Coverage](https://app.codacy.com/project/badge/Coverage/2748da79ec294f909996a56f11caac4a)](https://www.codacy.com/gh/justinhoward/cutoff/dashboard?utm_source=github.com&utm_medium=referral&utm_content=justinhoward/cutoff&utm_campaign=Badge_Coverage)
 [![Inline docs](http://inch-ci.org/github/justinhoward/cutoff.svg?branch=master)](http://inch-ci.org/github/justinhoward/cutoff)
 
 A deadlines library for Ruby inspired by Shopify and
