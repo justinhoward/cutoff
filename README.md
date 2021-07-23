@@ -20,8 +20,8 @@ Cutoff.wrap(5) do
 end
 ```
 
-It has a built-in patch for Mysql2 to auto-insert checkpoints and timeout query
-hints.
+It has built-in patches for Mysql2 and Net::HTTP to auto-insert checkpoints and
+timeouts.
 
 ```ruby
 require 'cutoff/patch/mysql2'
@@ -50,7 +50,7 @@ single query will take longer than 3 seconds. However, imagine a bad controller
 action or background job executes 100 slow queries. In that case, the queries
 add up to 300 seconds, much too long.
 
-Deadlines keep track of the total elapsed time in a request of job and interrupt
+Deadlines keep track of the total elapsed time in a request or job and interrupt
 it if it takes too long.
 
 Installation
@@ -138,8 +138,11 @@ Patches
 -------------
 
 Cutoff is in early stages, but it aims to provide patches for common networked
-dependencies. The first of these is the `mysql2` patch. It is not loaded by
-default, so you need to require it manually.
+dependencies. Patches automatically insert useful checkpoints and timeouts. The
+patches so far are for `mysql2` and `Net::HTTP`. They are not loaded by default,
+so you need to require them manually.
+
+For example, to load the Mysql2 patch:
 
 ```ruby
 # In your Gemfile
@@ -152,10 +155,14 @@ require 'cutoff'
 require 'cutoff/patch/mysql2'
 ```
 
-Once it is enabled, any `Mysql2::Client` object will respect the current cutoff
-if one is set.
+### Mysql2
+
+Once it is enabled, any `Mysql2::Client` object will respect the current
+class-level cutoff if one is set.
 
 ```ruby
+require 'cutoff/patch/mysql2'
+
 client = Mysql2::Client.new
 Cutoff.wrap(3) do
   sleep(4)
@@ -180,6 +187,33 @@ Cutoff.wrap(3) do
   # We don't even execute this query because time is already expired
   # This limit applies to all queries, including INSERTS, etc
   client.query('SELECT * FROM users')
+end
+```
+
+### Net::HTTP
+
+Once it is enabled, any `Net::HTTP` requests will respect the current
+class-level cutoff if one is set.
+
+```ruby
+require 'cutoff/patch/net_http'
+
+Cutoff.wrap(3) do
+  sleep(5)
+
+  # The cutoff is expired, so this hits a checkpoint and will not be executed
+  Net::HTTP.get(URI.parse('http://example.com'))
+end
+
+Cutoff.wrap(3) do
+  sleep(1.5)
+
+  # The cutoff has 1.5 seconds left, so this request will be executed
+  # open_timeout, read_timeout, and write_timeout (Ruby >= 2.6) will each
+  # be set to 1.5
+  # This means the overall time can be > 1.5 since the combined phases can take
+  # up to 4.5 seconds
+  Net::HTTP.get(URI.parse('http://example.com'))
 end
 ```
 
@@ -360,10 +394,9 @@ never interrupt a running program unless:
 - `checkpoint!` is called
 - a network timeout is exceeded
 
-Patches such as the current Mysql2 patch are designed to ease the burden on
-developers to manually call `checkpoint!` or configure network timeouts. The
-ruby `Timeout` class is not used. See Julia Evans' post on [Why Ruby's Timeout
-is dangerous][julia_evans].
+Patches are designed to ease the burden on developers to manually call
+`checkpoint!` or configure network timeouts. The ruby `Timeout` class is not
+used. See Julia Evans' post on [Why Ruby's Timeout is dangerous][julia_evans].
 
 Patches are only applied by explicit opt-in, and Cutoff can always be used as a
 standalone library.
