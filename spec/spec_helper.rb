@@ -21,6 +21,7 @@ end
 
 require 'cutoff'
 require 'timecop'
+require 'cutoff/patch/net_http'
 
 begin
   # We don't test Mysql2 on Ruby 2.3 since that would require
