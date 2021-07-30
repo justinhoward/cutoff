@@ -33,6 +33,8 @@ rescue LoadError
   # Ok if mysql2 isn't available
 end
 
+require_relative 'support'
+
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|
     expectations.include_chain_clauses_in_custom_matcher_descriptions = true

@@ -152,4 +152,74 @@ RSpec.describe Cutoff do
       expect(described_class.current.seconds_remaining).to eq(3)
     end
   end
+
+  describe '.now' do
+    after do
+      Cutoff::Timer.send(:remove_method, :now)
+      load './lib/cutoff/timer.rb'
+    end
+
+    it 'gets CLOCK_MONOTONIC_RAW if available' do
+      unless defined?(Process::CLOCK_MONOTONIC_RAW)
+        skip 'CLOCK_MONOTONIC_RAW now available to test'
+      end
+
+      Cutoff::Timer.send(:remove_method, :now)
+      load './lib/cutoff/timer.rb'
+      expect(Process).to receive(:clock_gettime)
+        .with(Process::CLOCK_MONOTONIC_RAW)
+
+      Cutoff.now
+    end
+
+    context 'when CLOCK_MONOTONIC_RAW is not available' do
+      before do
+        hide_const('Process::CLOCK_MONOTONIC_RAW')
+        Cutoff::Timer.send(:remove_method, :now)
+        load './lib/cutoff/timer.rb'
+      end
+
+      it 'gets CLOCK_MONOTONIC if available' do
+        unless defined?(Process::CLOCK_MONOTONIC)
+          skip 'CLOCK_MONOTONIC now available to test'
+        end
+
+        expect(Process).to receive(:clock_gettime)
+          .with(Process::CLOCK_MONOTONIC)
+
+        Cutoff.now
+      end
+    end
+
+    context 'when CLOCK_MONOTONIC is not available' do
+      before do
+        hide_const('Process::CLOCK_MONOTONIC_RAW')
+        hide_const('Process::CLOCK_MONOTONIC')
+        Cutoff::Timer.send(:remove_method, :now)
+        load './lib/cutoff/timer.rb'
+      end
+
+      it 'gets Concurrent.monotonic_time if available' do
+        expect(Concurrent).to receive(:monotonic_time)
+        Cutoff.now
+      end
+    end
+
+    context 'when concurrent-ruby gem is not available' do
+      before do
+        hide_const('Process::CLOCK_MONOTONIC_RAW')
+        hide_const('Process::CLOCK_MONOTONIC')
+        loaded_specs = Gem.loaded_specs.dup
+        loaded_specs.delete('concurrent-ruby')
+        allow(Gem).to receive(:loaded_specs).and_return(loaded_specs)
+        Cutoff::Timer.send(:remove_method, :now)
+        load './lib/cutoff/timer.rb'
+      end
+
+      it 'gets Time.now' do
+        expect(Time).to receive(:now)
+        Cutoff.now
+      end
+    end
+  end
 end

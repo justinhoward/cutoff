@@ -23,4 +23,4 @@ gem 'simplecov', '>= 0.17.1'
 gem 'simplecov-lcov', '~> 0.7', '< 0.8'
 gem 'yard', '~> 0.9.25', platforms: not_jruby
 
-gem 'concurrent-ruby' if ENV['WITH_CONCURRENT_RUBY'] == 'true'
+gem 'concurrent-ruby'
