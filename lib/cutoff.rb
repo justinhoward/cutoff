@@ -87,6 +87,31 @@ class Cutoff
 
       cutoff.checkpoint!
     end
+
+    # Disable Cutoff globally. Useful for testing and debugging
+    #
+    # Should not be used in production
+    #
+    # @return [void]
+    def disable!
+      @disabled = true
+    end
+
+    # Enable Cutoff globally if it has been disabled
+    #
+    # Should not be used in production
+    #
+    # @return [void]
+    def enable!
+      @disabled = false
+    end
+
+    # True if cutoff was disabled with {#disable!}
+    #
+    # @return [Boolean] True if disabled
+    def disabled?
+      @disabled == true
+    end
   end
 
   # @return [Float] The total number of seconds for this cutoff
@@ -120,6 +145,8 @@ class Cutoff
   #
   # @return [Float] The number of seconds
   def elapsed_seconds
+    return 0 if Cutoff.disabled?
+
     Cutoff.now - @start_time
   end
 
