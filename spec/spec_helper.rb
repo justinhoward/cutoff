@@ -55,5 +55,6 @@ RSpec.configure do |config|
   config.after do
     Timecop.return
     Cutoff.clear_all
+    Cutoff.enable!
   end
 end

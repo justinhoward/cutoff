@@ -66,6 +66,21 @@ RSpec.describe Cutoff do
     expect(described_class.version).to be_a(Gem::Version)
   end
 
+  it 'does not advance timer when disabled' do
+    Timecop.freeze
+    cutoff = described_class.new(3)
+    Cutoff.disable!
+    Timecop.freeze(4)
+    expect(cutoff.elapsed_seconds).to eq(0)
+    expect(cutoff.seconds_remaining).to eq(3)
+  end
+
+  it 'reports if it is disabled' do
+    expect(Cutoff.disabled?).to eq(false)
+    Cutoff.disable!
+    expect(Cutoff.disabled?).to eq(true)
+  end
+
   describe 'class methods' do
     it '.start and .stop push and pop from the stack' do
       Timecop.freeze

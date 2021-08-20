@@ -250,6 +250,22 @@ class ApplicationController < ActionController::Base
 end
 ```
 
+Disabling Cutoff for Testing and Development
+------------
+
+When testing or debugging an application that uses Cutoff, you may want to
+disable Cutoff entirely. These methods are not thread-safe and not intended for
+production.
+
+```ruby
+# This disables all cutoff timers, for both global and local instances
+Cutoff.disable!
+Cutoff.disabled? # => true
+
+# Re-enable cutoff
+Cutoff.enable!
+```
+
 Multi-threading
 -----------------
 
