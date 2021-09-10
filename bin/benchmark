@@ -1,0 +1,42 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'bundler/setup'
+require 'benchmark'
+require 'cutoff'
+require 'cutoff/patch/mysql2'
+
+n = 1_000_000
+puts "Basics x#{n}"
+Benchmark.bm(25) do |b|
+  b.report('global cutoff wrap') do
+    n.times { Cutoff.wrap(3) { Cutoff.checkpoint! } }
+  end
+
+  b.report('global 2 nested cutoffs') do
+    n.times do
+      Cutoff.wrap(3) do
+        Cutoff.wrap(2) do
+          Cutoff.checkpoint!
+        end
+      end
+    end
+  end
+end
+
+n = 1_000_000
+puts "\nMySQL Hints x#{n}"
+Benchmark.bm(25) do |b|
+  b.report('annotate small query') do
+    n.times { Cutoff::Patch::Mysql2::QueryWithMaxTime.new('SELECT * FROM users', 3).to_s }
+  end
+
+  query = "SELECT #{Array.new(1000, 'a, ')}, a FROM users"
+  b.report('annotate large query') do
+    n.times { Cutoff::Patch::Mysql2::QueryWithMaxTime.new(query, 3).to_s }
+  end
+
+  b.report('skip update query') do
+    n.times { Cutoff::Patch::Mysql2::QueryWithMaxTime.new("UPDATE users SET name = 'Justin'", 3).to_s }
+  end
+end
