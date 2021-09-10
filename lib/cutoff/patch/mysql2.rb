@@ -45,8 +45,8 @@ class Cutoff
 
           # Loop through tokens like "WORD " or "/* "
           while @scanner.scan(/(\S+)\s+/)
-            # Get the word part. None of our tokens care about case
-            handle_token(@scanner[1].downcase)
+            # Get the word part
+            handle_token(@scanner[1])
           end
 
           return @scanner.string unless @found_select
@@ -68,7 +68,7 @@ class Cutoff
             hint_comment
           elsif token.start_with?('/*')
             block_comment
-          elsif token.start_with?('select')
+          elsif token.match?(/^select/i)
             select
           else
             other
