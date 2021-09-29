@@ -1,5 +1,7 @@
 # frozen_string_literal:true
 
+require 'set'
+
 require 'cutoff/version'
 require 'cutoff/error'
 require 'cutoff/patch'
@@ -27,13 +29,14 @@ class Cutoff
     # If a cutoff is already started for this thread, then `start` uses the
     # minimum of the current remaining time and the given time
     #
-    # @param seconds [Float, Integer] The number of seconds for the cutoff. May
-    #   be overridden if there is an active cutoff and it has less remaining
-    #   time.
+    # @param (see #initialize)
     # @return [Cutoff] The {Cutoff} instance
-    def start(seconds)
-      seconds = [seconds, current.seconds_remaining].min if current
-      cutoff = Cutoff.new(seconds)
+    def start(allowed_seconds, **options)
+      if current
+        allowed_seconds = [allowed_seconds, current.seconds_remaining].min
+      end
+
+      cutoff = new(allowed_seconds, **options)
       Thread.current[CURRENT_STACK_KEY] ||= []
       Thread.current[CURRENT_STACK_KEY] << cutoff
       cutoff
@@ -70,9 +73,10 @@ class Cutoff
     #
     # @see .start
     # @see .stop
+    # @param (see #initialize)
     # @return The value that returned from the block
-    def wrap(seconds)
-      cutoff = start(seconds)
+    def wrap(allowed_seconds, **options)
+      cutoff = start(allowed_seconds, **options)
       yield cutoff
     ensure
       stop(cutoff)
@@ -84,11 +88,11 @@ class Cutoff
     #
     # @raise CutoffExceededError If there is an active expired cutoff
     # @return [void]
-    def checkpoint!
+    def checkpoint!(name = nil)
       cutoff = current
       return unless cutoff
 
-      cutoff.checkpoint!
+      cutoff.checkpoint!(name)
     end
 
     # Disable Cutoff globally. Useful for testing and debugging
@@ -109,7 +113,7 @@ class Cutoff
       @disabled = false
     end
 
-    # True if cutoff was disabled with {#disable!}
+    # True if cutoff was disabled with {.disable!}
     #
     # @return [Boolean] True if disabled
     def disabled?
@@ -124,10 +128,22 @@ class Cutoff
   #
   # The timer starts immediately upon creation
   #
-  # @param allowed_seconds [Integer, Float] The total number of seconds to allow
-  def initialize(allowed_seconds)
+  # @param allowed_seconds [Float, Integer] The total number of seconds to allow
+  # @param exclude [Enumberable<Symbol>, Symbol, nil] If given a name or
+  #   list of checkpoint names to skip
+  # @param only [Enumberable<Symbol>, Symbol, nil] If given a name or
+  #   list of checkpoint names to allow
+  def initialize(allowed_seconds, exclude: nil, only: nil)
     @allowed_seconds = allowed_seconds.to_f
     @start_time = Cutoff.now
+
+    if exclude
+      @exclude = Set.new(exclude.is_a?(Enumerable) ? exclude : [exclude])
+    end
+
+    if only
+      @only = Set.new(only.is_a?(Enumerable) ? only : [only])
+    end
   end
 
   # The number of seconds left on the clock
@@ -164,9 +180,29 @@ class Cutoff
   #
   # @raise CutoffExceededError If there is an active expired cutoff
   # @return [void]
-  def checkpoint!
+  def checkpoint!(name = nil)
+    unless name.nil? || name.is_a?(Symbol)
+      raise ArgumentError, 'name must be a symbol'
+    end
+
+    return unless selected?(name)
     raise CutoffExceededError, self if exceeded?
 
     nil
+  end
+
+  # True if the named checkpoint is selected by the `exclude` and `only`
+  # options. If these options are not given, a checkpoint is considered to be
+  # selected. If the checkpoint is not named, it is also considered to be
+  # selected.
+  #
+  # @param name [Symbol, nil] The name of the checkpoint
+  # @return [Boolean] True if the checkpoint is selected
+  def selected?(name)
+    return true if name.nil? && @exclude
+    return false if @exclude&.include?(name)
+    return false if @only && !@only.include?(name)
+
+    true
   end
 end

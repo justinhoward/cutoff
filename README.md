@@ -217,6 +217,29 @@ Cutoff.wrap(3) do
 end
 ```
 
+Selecting Checkpoints
+---------------------------
+
+In some cases, you may want to select some checkpoints to use, but not others.
+For example, you may want to run some code that contains MySQL queries, but not
+use the mysql2 patch. The `exclude` and `only` options support this.
+
+```ruby
+Cutoff.wrap(10, exclude: :mysql2) do
+  # The mysql2 patch won't be used here
+end
+
+Cutoff.wrap(10, only: %i[foo bar]) do
+  # These checkpoints will be used
+  Cutoff.checkpoint!(:foo)
+  Cutoff.checkpoint!(:bar)
+
+  # These checkpoints will be skipped
+  Cutoff.checkpoint!(:asdf)
+  Cutoff.checkpoint!
+end
+```
+
 Timing a Rails Controller
 ---------------------------
 

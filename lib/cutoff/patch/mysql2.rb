@@ -6,7 +6,8 @@ require 'mysql2'
 class Cutoff
   module Patch
     # Sets the max execution time for SELECT queries if there is an active
-    # cutoff and it has time remaining
+    # cutoff and it has time remaining. You can select this patch with
+    # `exclude` or `only` using the checkpoint name `:mysql2`.
     module Mysql2
       # Overrides `Mysql2::Client#query` to insert a MAX_EXECUTION_TIME query
       # hint with the remaining cutoff time
@@ -19,9 +20,9 @@ class Cutoff
       #   be executed in this case.
       def query(sql, options = {})
         cutoff = Cutoff.current
-        return super unless cutoff
+        return super unless cutoff&.selected?(:mysql2)
 
-        cutoff.checkpoint!
+        cutoff.checkpoint!(:mysql2)
         sql = QueryWithMaxTime.new(sql, cutoff.ms_remaining.ceil).to_s
         super
       end

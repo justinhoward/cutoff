@@ -37,6 +37,15 @@ RSpec.describe 'Cutoff::Patch::Mysql2', if: defined?(Mysql2) do
     client.query('SELECT 1 FROM dual')
   end
 
+  it 'does nothing if excluded' do
+    expect(client).to receive(:_query)
+      .with('SELECT 1 FROM dual', any_args)
+    Timecop.freeze
+    Cutoff.wrap(3, exclude: :mysql2) do
+      client.query('SELECT 1 FROM dual')
+    end
+  end
+
   it 'does nothing for insert if there is time remaining' do
     expect(client).to receive(:_query)
       .with("INSERT users(first_name) VALUES('Bob')", any_args)

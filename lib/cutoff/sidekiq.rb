@@ -17,9 +17,10 @@ class Cutoff
     #     end
     #   end
     class ServerMiddleware
-      # @param [Object] worker the worker instance
-      # @param [Hash] job the full job payload
-      # @param [String] queue the name of the queue the job was pulled from
+      # @param worker [Object] the worker instance
+      # @param _job [Hash] the full job payload
+      # @param _queue [String] queue the name of the queue the job was pulled
+      #   from
       # @yield the next middleware in the chain or worker `perform` method
       # @return [void]
       def call(worker, _job, _queue)
