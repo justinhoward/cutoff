@@ -4,27 +4,36 @@ require 'net/http'
 
 class Cutoff
   module Patch
-    # Adds a checkpoint for starting HTTP requests and sets network timeouts
-    # to the remaining time
     module NetHttp
-      # Construct a {Net::HTTP}, but with the timeouts set to the remaining
-      # cutoff time if one is active
-      def initialize(address, port = nil)
-        super
-        return unless (cutoff = Cutoff.current)
-
-        @open_timeout = cutoff.seconds_remaining
-        @read_timeout = cutoff.seconds_remaining
-        @write_timeout = cutoff.seconds_remaining
+      def self.gen_timeout_method(name)
+        <<~RUBY
+          if #{name}.nil? || #{name} > remaining
+            self.#{name} = cutoff.seconds_remaining
+          end
+        RUBY
       end
 
-      # Same as the original start, but with a cutoff checkpoint
+      def self.use_write_timeout?
+        Gem::Version.new(RUBY_VERSION) > Gem::Version.new('2.6')
+      end
+
+      # Same as the original start, but adds a checkpoint for starting HTTP
+      # requests and sets network timeouts to the remaining time
       #
-      # @see {Net::HTTP#start}
-      def start
-        Cutoff.checkpoint!
-        super
-      end
+      # @see Net::HTTP#start
+      module_eval(<<~RUBY, __FILE__, __LINE__ + 1)
+        def start
+          if (cutoff = Cutoff.current)
+            remaining = cutoff.seconds_remaining
+            #{gen_timeout_method('open_timeout')}
+            #{gen_timeout_method('read_timeout')}
+            #{gen_timeout_method('write_timeout') if use_write_timeout?}
+            #{gen_timeout_method('continue_timeout')}
+            Cutoff.checkpoint!
+          end
+          super
+        end
+      RUBY
     end
   end
 end

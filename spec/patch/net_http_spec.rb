@@ -10,13 +10,26 @@ RSpec.describe Cutoff::Patch::NetHttp do
     end.to raise_error(Cutoff::CutoffExceededError)
   end
 
-  it 'sets timeouts to remaining seconds' do
+  it 'sets timeouts to remaining seconds during start' do
     Timecop.freeze
     Cutoff.start(5)
     Timecop.freeze(2)
-    http = Net::HTTP.new(URI.parse('http://example.com'))
-    expect(http.open_timeout).to eq(3)
-    expect(http.read_timeout).to eq(3)
+    uri = URI.parse('http://example.com')
+    Net::HTTP.start(uri.host, uri.port, read_timeout: 20) do |http|
+      expect(http.read_timeout).to eq(3)
+      expect(http.continue_timeout).to eq(3)
+      expect(http.open_timeout).to eq(3)
+    end
+  end
+
+  it 'uses existing timeout if smaller' do
+    Timecop.freeze
+    Cutoff.start(5)
+    Timecop.freeze(2)
+    uri = URI.parse('http://example.com')
+    Net::HTTP.start(uri.host, uri.port, read_timeout: 1) do |http|
+      expect(http.read_timeout).to eq(1)
+    end
   end
 
   it 'sets write timeout for ruby >=2.6' do
@@ -25,9 +38,10 @@ RSpec.describe Cutoff::Patch::NetHttp do
     Timecop.freeze
     Cutoff.start(5)
     Timecop.freeze(2)
-    http = Net::HTTP.new(URI.parse('http://example.com'))
-
-    expect(http.write_timeout).to eq(3)
+    uri = URI.parse('http://example.com')
+    Net::HTTP.start(uri.host, uri.port) do |http|
+      expect(http.write_timeout).to eq(3)
+    end
   end
 
   it 'does nothing if cutoff is not active' do
