@@ -27,6 +27,7 @@ Gem::Specification.new do |spec|
 
   # 0.81 is the last rubocop version with Ruby 2.3 support
   spec.add_development_dependency 'rspec', '~> 3.10'
+  spec.add_development_dependency 'rspec-rails', '~> 5.0'
   spec.add_development_dependency 'rubocop', '0.81.0'
   spec.add_development_dependency 'rubocop-rspec', '1.38.1'
   spec.add_development_dependency 'timecop', '>= 0.9', '< 1.0'

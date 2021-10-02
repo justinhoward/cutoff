@@ -20,8 +20,11 @@ if ENV['COVERAGE'] || ENV['CI']
 end
 
 require 'cutoff'
-require 'timecop'
 require 'cutoff/patch/net_http'
+
+require 'timecop'
+require 'rails'
+require 'rspec/rails'
 
 begin
   # We don't test Mysql2 on Ruby 2.3 since that would require
@@ -34,6 +37,10 @@ rescue LoadError
 end
 
 require_relative 'support'
+
+class TestRailsApp < Rails::Application
+  config.secret_key_base = 'secret'
+end
 
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|
