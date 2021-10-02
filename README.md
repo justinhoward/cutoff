@@ -220,25 +220,52 @@ end
 Timing a Rails Controller
 ---------------------------
 
-One use of a cutoff is to add a deadline to a Rails controller action.
+One use of a cutoff is to add a deadline to a Rails controller action. This is
+typically preferable to approaches like `Rack::Timeout` that use the dangerous
+`Timeout` class.
+
+Cutoff includes a built-in integration for this purpose. If Rails is installed,
+the `#cutoff` class method is available in your controllers.
 
 ```ruby
-around_action { |_controller, action| Cutoff.wrap(2.5) { action.call } }
-```
+class ApplicationController < ActionController::Base
+  # You may want to set a long global cutoff, but it's not required
+  cutoff 30
+end
 
-Now in your action, you can call `checkpoint!`, or if you're using the Mysql2
-patch, checkpoints will be added automatically.
+class UsersController < ApplicationController
+  cutoff 5.0
 
-```ruby
-def index
-  # Do thing one
-  Cutoff.checkpoint!
-
-  # Do something else
+  def index
+    # Now in your action, you can call `checkpoint!`, or if you're using the
+    # patches, checkpoints will be added automatically
+    Cutoff.checkpoint!
+  end
 end
 ```
 
-Consider adding a global error handler for the `Cutoff::CutoffExceededError`
+Just like with controller filters, you can use filters with the cutoff method.
+
+```ruby
+class UsersController < ApplicationController
+  # For example, use an :only filter
+  cutoff 5.0, only: :index
+
+  # Multiple calls work just fine. Last match wins
+  cutoff 2.5, only: :show
+
+  def index
+    # ...
+  end
+
+  def show
+    # ...
+  end
+end
+```
+
+Consider adding a global error handler for the `Cutoff::CutoffExceededError` in
+case you want to display a nice error page for timeouts.
 
 ```ruby
 class ApplicationController < ActionController::Base

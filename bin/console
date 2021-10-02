@@ -2,8 +2,8 @@
 # frozen_string_literal: true
 
 require 'bundler/setup'
-require 'cutoff'
 require 'byebug' if Gem.loaded_specs['byebug']
+require 'cutoff'
 require 'irb'
 
 IRB.start

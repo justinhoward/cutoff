@@ -10,6 +10,7 @@ gemspec
 
 not_jruby = %i[ruby mingw x64_mingw].freeze
 
+gem 'actionpack'
 gem 'bundler', '>= 1.17', '< 3'
 gem 'byebug', platforms: not_jruby
 gem 'irb', '~> 1.0'

@@ -1,9 +1,10 @@
 # frozen_string_literal:true
 
-require_relative 'cutoff/version'
-require_relative 'cutoff/error'
-require_relative 'cutoff/patch'
-require_relative 'cutoff/timer'
+require 'cutoff/version'
+require 'cutoff/error'
+require 'cutoff/patch'
+require 'cutoff/timer'
+require 'cutoff/rails'
 
 class Cutoff
   CURRENT_STACK_KEY = 'cutoff_deadline_stack'
