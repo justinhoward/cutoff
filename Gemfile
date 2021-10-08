@@ -18,6 +18,7 @@ gem 'irb', '~> 1.0'
 gem 'mysql2', '>= 0.5.0', platforms: not_jruby
 gem 'redcarpet', '~> 3.5', platforms: not_jruby
 gem 'rspec_junit_formatter', '~> 0.4'
+gem 'sidekiq', '>= 5'
 gem 'simplecov', '>= 0.17.1'
 # 0.8 is incompatible with simplecov < 0.18
 # https://github.com/fortissimo1997/simplecov-lcov/pull/25

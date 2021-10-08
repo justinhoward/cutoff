@@ -277,6 +277,26 @@ class ApplicationController < ActionController::Base
 end
 ```
 
+Timing Sidekiq Workers
+------------
+
+If Sidekiq is loaded, Cutoff includes middleware to support a `:cutoff` option.
+
+```ruby
+class MyWorker
+  include Sidekiq::Worker
+
+  sidekiq_options cutoff: 6.0
+
+  def perform
+    # ...
+    Cutoff.checkpoint!
+    # ...
+  end
+end
+```
+
+
 Disabling Cutoff for Testing and Development
 ------------
 
