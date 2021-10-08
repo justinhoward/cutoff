@@ -1,0 +1,39 @@
+# frozen_string_literal: true
+
+require 'sidekiq'
+
+class Cutoff
+  module Sidekiq
+    # Add an option `cutoff` for sidekiq workers
+    #
+    # @example
+    #   class MyWorker
+    #     include Sidekiq::Worker
+    #
+    #     sidekiq_options cutoff: 6.0
+    #
+    #     def perform
+    #       # ...
+    #     end
+    #   end
+    class ServerMiddleware
+      # @param [Object] worker the worker instance
+      # @param [Hash] job the full job payload
+      # @param [String] queue the name of the queue the job was pulled from
+      # @yield the next middleware in the chain or worker `perform` method
+      # @return [void]
+      def call(worker, _job, _queue)
+        allowed_seconds = worker.class.sidekiq_options['cutoff']
+        return yield if allowed_seconds.nil?
+
+        Cutoff.wrap(allowed_seconds) { yield }
+      end
+    end
+  end
+end
+
+::Sidekiq.configure_server do |config|
+  config.server_middleware do |chain|
+    chain.add(Cutoff::Sidekiq::ServerMiddleware)
+  end
+end

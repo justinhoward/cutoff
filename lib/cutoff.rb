@@ -4,7 +4,9 @@ require 'cutoff/version'
 require 'cutoff/error'
 require 'cutoff/patch'
 require 'cutoff/timer'
+
 require 'cutoff/rails'
+require 'cutoff/sidekiq' if Gem.loaded_specs['sidekiq']
 
 class Cutoff
   CURRENT_STACK_KEY = 'cutoff_deadline_stack'

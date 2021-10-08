@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+ENV['RAILS_ENV'] = 'test'
+
 require 'byebug' if Gem.loaded_specs['byebug']
 
 if ENV['COVERAGE'] || ENV['CI']
@@ -25,6 +27,7 @@ require 'cutoff/patch/net_http'
 require 'timecop'
 require 'rails'
 require 'rspec/rails'
+require 'sidekiq/testing'
 
 begin
   # We don't test Mysql2 on Ruby 2.3 since that would require
@@ -37,10 +40,6 @@ rescue LoadError
 end
 
 require_relative 'support'
-
-class TestRailsApp < Rails::Application
-  config.secret_key_base = 'secret'
-end
 
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|
