@@ -47,7 +47,7 @@ RSpec.describe Cutoff do
     cutoff.checkpoint!
   end
 
-  it 'passes checkpoint if there is time remaining' do
+  it 'raises error if expired' do
     Timecop.freeze
     cutoff = described_class.new(3)
     Timecop.freeze(4)
@@ -55,6 +55,59 @@ RSpec.describe Cutoff do
       Cutoff::CutoffExceededError,
       'Cutoff exceeded: allowed_seconds=3.0 elapsed_seconds=4.0'
     )
+  end
+
+  it 'passes checkpoint if given name is excluded' do
+    Timecop.freeze
+    cutoff = described_class.new(3, exclude: %i[test])
+    Timecop.freeze(4)
+    cutoff.checkpoint!(:test)
+  end
+
+  it 'raises error if name is not excluded' do
+    Timecop.freeze
+    cutoff = described_class.new(3, exclude: %i[test])
+    Timecop.freeze(4)
+    expect { cutoff.checkpoint! }.to raise_error(Cutoff::CutoffExceededError)
+    expect { cutoff.checkpoint!(:other) }
+      .to raise_error(Cutoff::CutoffExceededError)
+  end
+
+  it 'passes checkpoint if name is not included in only' do
+    Timecop.freeze
+    cutoff = described_class.new(3, only: %i[foo])
+    Timecop.freeze(4)
+    cutoff.checkpoint!(:test)
+  end
+
+  it 'raises error if name is in only' do
+    Timecop.freeze
+    cutoff = described_class.new(3, only: %i[test])
+    Timecop.freeze(4)
+    expect { cutoff.checkpoint!(:test) }
+      .to raise_error(Cutoff::CutoffExceededError)
+  end
+
+  it 'passes checkpoint if name is in only and excluded' do
+    Timecop.freeze
+    cutoff = described_class.new(3, only: :test, exclude: :test)
+    Timecop.freeze(4)
+    cutoff.checkpoint!(:test)
+  end
+
+  it 'raises error if name is nil with excluded names' do
+    Timecop.freeze
+    cutoff = described_class.new(3, only: :test, exclude: :test)
+    Timecop.freeze(4)
+    expect { cutoff.checkpoint! }
+      .to raise_error(Cutoff::CutoffExceededError)
+  end
+
+  it 'passes checkpoint if name is nil with only names' do
+    Timecop.freeze
+    cutoff = described_class.new(3, only: %i[test])
+    Timecop.freeze(4)
+    cutoff.checkpoint!
   end
 
   it 'gets ms from seconds' do
