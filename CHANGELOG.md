@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.2] - 2021-10-14
+
+- Add sidekiq middleware
+- Select checkpoints to enable or disable
+
 ## [0.4.1] - 2021-10-02
 
 - Fix Net::HTTP patch to override timeouts given to start
@@ -34,7 +39,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Mysql2 patch
 
 [Unreleased]: https://github.com/justinhoward/cutoff/compare/v0.4.1...HEAD
-[0.4.0]: https://github.com/justinhoward/cutoff/compare/v0.4.0...v0.4.1
+[0.4.2]: https://github.com/justinhoward/cutoff/compare/v0.4.1...v0.4.2
+[0.4.1]: https://github.com/justinhoward/cutoff/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/justinhoward/cutoff/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/justinhoward/cutoff/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/justinhoward/cutoff/compare/v0.1.0...v0.2.0

@@ -3,6 +3,6 @@
 class Cutoff
   # @return [Gem::Version] The current version of the cutoff gem
   def self.version
-    Gem::Version.new('0.4.1')
+    Gem::Version.new('0.4.2')
   end
 end
