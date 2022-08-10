@@ -227,36 +227,21 @@ RSpec.describe Cutoff do
       load './lib/cutoff/timer.rb'
     end
 
-    it 'gets CLOCK_MONOTONIC_RAW if available' do
-      unless defined?(Process::CLOCK_MONOTONIC_RAW)
-        skip 'CLOCK_MONOTONIC_RAW now available to test'
-      end
-
+    before do
+      hide_const('Process::CLOCK_MONOTONIC_RAW')
       Cutoff::Timer.send(:remove_method, :now)
       load './lib/cutoff/timer.rb'
-      expect(Process).to receive(:clock_gettime)
-        .with(Process::CLOCK_MONOTONIC_RAW)
-
-      Cutoff.now
     end
 
-    context 'when CLOCK_MONOTONIC_RAW is not available' do
-      before do
-        hide_const('Process::CLOCK_MONOTONIC_RAW')
-        Cutoff::Timer.send(:remove_method, :now)
-        load './lib/cutoff/timer.rb'
+    it 'gets CLOCK_MONOTONIC if available' do
+      unless defined?(Process::CLOCK_MONOTONIC)
+        skip 'CLOCK_MONOTONIC now available to test'
       end
 
-      it 'gets CLOCK_MONOTONIC if available' do
-        unless defined?(Process::CLOCK_MONOTONIC)
-          skip 'CLOCK_MONOTONIC now available to test'
-        end
+      expect(Process).to receive(:clock_gettime)
+        .with(Process::CLOCK_MONOTONIC)
 
-        expect(Process).to receive(:clock_gettime)
-          .with(Process::CLOCK_MONOTONIC)
-
-        Cutoff.now
-      end
+      Cutoff.now
     end
 
     context 'when CLOCK_MONOTONIC is not available' do
