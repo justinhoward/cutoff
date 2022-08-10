@@ -2,7 +2,7 @@
 
 class Cutoff
   # The Cutoff base error class
-  class CutoffError < StandardError
+  module CutoffError
     private
 
     def message_with_meta(message, **meta)
@@ -15,7 +15,9 @@ class Cutoff
   end
 
   # Raised by {Cutoff#checkpoint!} if the time has been exceeded
-  class CutoffExceededError < CutoffError
+  class CutoffExceededError < Timeout::Error
+    include CutoffError
+
     attr_reader :cutoff
 
     def initialize(cutoff)

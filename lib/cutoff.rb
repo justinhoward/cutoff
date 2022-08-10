@@ -1,6 +1,7 @@
 # frozen_string_literal:true
 
 require 'set'
+require 'timeout'
 
 require 'cutoff/version'
 require 'cutoff/error'
