@@ -26,6 +26,7 @@ jobs:
           REDIS_VERSION: ${{ matrix.redis }}
         with:
           ruby-version: ${{ matrix.ruby }}
+          bundler: ${{ matrix.bundler }}
           bundler-cache: true
       - run: bundle exec rubocop
         if: matrix.ruby == '2.7'
@@ -35,12 +36,10 @@ jobs:
         env:
           MYSQL_USER: root
           MYSQL_PASSWORD: root
-      - name: Run codacy-coverage-reporter
-        uses: codacy/codacy-coverage-reporter-action@master
+      - uses: codecov/codecov-action@v3
         if: matrix.ruby == '2.7'
         with:
-          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-          coverage-reports: coverage/lcov/cutoff.lcov
+          files: coverage/coverage.xml
       - run: bin/check-version
 
   release:
