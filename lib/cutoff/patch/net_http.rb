@@ -23,6 +23,7 @@ class Cutoff
       # Same as the original start, but adds a checkpoint for starting HTTP
       # requests and sets network timeouts to the remaining time
       #
+      # @method start
       # @see Net::HTTP#start
       module_eval(<<~RUBY, __FILE__, __LINE__ + 1)
         def start

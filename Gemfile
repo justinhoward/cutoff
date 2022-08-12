@@ -26,3 +26,8 @@ gem 'simplecov-lcov', '~> 0.7', '< 0.8'
 gem 'yard', '~> 0.9.25', platforms: not_jruby
 
 gem 'concurrent-ruby'
+
+if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.6')
+  gem 'rubocop', '1.34.1'
+  gem 'rubocop-rspec', '2.12'
+end

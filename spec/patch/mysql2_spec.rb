@@ -3,11 +3,11 @@
 RSpec.describe 'Cutoff::Patch::Mysql2', if: defined?(Mysql2) do
   let(:client) do
     Mysql2::Client.new({
-      username: ENV['MYSQL_USER'],
-      password: ENV['MYSQL_PASSWORD'],
-      host: ENV['MYSQL_HOST'],
-      port: ENV['MYSQL_PORT'],
-      socket: ENV['MYSQL_SOCKET']
+      username: ENV.fetch('MYSQL_USER', nil),
+      password: ENV.fetch('MYSQL_PASSWORD', nil),
+      host: ENV.fetch('MYSQL_HOST', nil),
+      port: ENV.fetch('MYSQL_PORT', nil),
+      socket: ENV.fetch('MYSQL_SOCKET', nil)
     })
   end
 

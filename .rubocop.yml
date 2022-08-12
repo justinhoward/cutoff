@@ -1,45 +1,125 @@
 ---
+require:
+  - rubocop-rspec
+
 AllCops:
   TargetRubyVersion: 2.3
-  Exclude:
-    - bin/**/*
-    - vendor/**/*
 
-Layout/EndAlignment:
-  EnforcedStyleAlignWith: variable
-Layout/FirstArrayElementIndentation:
-  EnforcedStyle: consistent
-Layout/FirstHashElementIndentation:
-  EnforcedStyle: consistent
-Layout/MultilineMethodCallIndentation:
-  EnforcedStyle: indented
-Layout/ParameterAlignment:
-  EnforcedStyle: with_fixed_indentation
+Gemspec/DeprecatedAttributeAssignment: { Enabled: true }
+Gemspec/RequireMFA: { Enabled: true }
 
-Lint/MissingCopEnableDirective:
-  Enabled: false
-Lint/RaiseException:
-  Enabled: true
-Lint/StructNewOverride:
-  Enabled: true
+Layout/ArgumentAlignment: { EnforcedStyle: with_fixed_indentation }
+Layout/CaseIndentation: { EnforcedStyle: end }
+Layout/EndAlignment: { EnforcedStyleAlignWith: start_of_line }
+Layout/FirstArgumentIndentation: { EnforcedStyle: consistent }
+Layout/FirstArrayElementIndentation: { EnforcedStyle: consistent }
+Layout/FirstHashElementIndentation: { EnforcedStyle: consistent }
+Layout/LineContinuationLeadingSpace: { Enabled: true }
+Layout/LineContinuationSpacing: { Enabled: true }
+Layout/LineEndStringConcatenationIndentation: { Enabled: true }
+Layout/LineLength: { Max: 120 }
+Layout/MultilineMethodCallIndentation: { EnforcedStyle: indented }
+Layout/ParameterAlignment: { EnforcedStyle: with_fixed_indentation }
+Layout/RescueEnsureAlignment: { Enabled: false }
+Layout/SpaceBeforeBrackets: { Enabled: true }
 
-Metrics/AbcSize:
-  Enabled: false
-Metrics/BlockLength:
-  Exclude:
-    - spec/**/*
-Metrics/CyclomaticComplexity:
-  Enabled: false
-Metrics/MethodLength:
-  Max: 16
+Lint/AmbiguousAssignment: { Enabled: true }
+Lint/AmbiguousOperatorPrecedence: { Enabled: true }
+Lint/AmbiguousRange: { Enabled: true }
+Lint/ConstantOverwrittenInRescue: { Enabled: true }
+Lint/DeprecatedConstants: { Enabled: true }
+Lint/DuplicateBranch: { Enabled: true }
+Lint/DuplicateRegexpCharacterClassElement: { Enabled: true }
+Lint/EmptyBlock: { Enabled: true }
+Lint/EmptyClass: { Enabled: true }
+Lint/EmptyInPattern: { Enabled: true }
+Lint/IncompatibleIoSelectWithFiberScheduler: { Enabled: true }
+Lint/LambdaWithoutLiteralBlock: { Enabled: true }
+Lint/NoReturnInBeginEndBlocks: { Enabled: true }
+Lint/NonAtomicFileOperation: { Enabled: true }
+Lint/NumberedParameterAssignment: { Enabled: true }
+Lint/OrAssignmentToConstant: { Enabled: true }
+Lint/RaiseException: { Enabled: true }
+Lint/RedundantDirGlobSort: { Enabled: true }
+Lint/RefinementImportMethods: { Enabled: true }
+Lint/RequireRangeParentheses: { Enabled: true }
+Lint/RequireRelativeSelfPath: { Enabled: true }
+Lint/StructNewOverride: { Enabled: true }
+Lint/SymbolConversion: { Enabled: true }
+Lint/ToEnumArguments: { Enabled: true }
+Lint/TripleQuotes: { Enabled: true }
+Lint/UnexpectedBlockArity: { Enabled: true }
+Lint/UnmodifiedReduceAccumulator: { Enabled: true }
+Lint/UselessRuby2Keywords: { Enabled: true }
 
-Style/Documentation:
-  Enabled: false
-Style/GuardClause:
-  Enabled: false
-Style/HashEachMethods:
-  Enabled: true
-Style/HashTransformKeys:
-  Enabled: true
-Style/HashTransformValues:
-  Enabled: true
+RSpec/BeEq: { Enabled: true }
+RSpec/BeNil: { Enabled: true }
+RSpec/Capybara/SpecificMatcher: { Enabled: true }
+RSpec/ChangeByZero: { Enabled: true }
+RSpec/ExampleLength: { Enabled: false }
+RSpec/ExcessiveDocstringSpacing: { Enabled: true }
+RSpec/FactoryBot/SyntaxMethods: { Enabled: true }
+RSpec/FilePath: { Enabled: false }
+RSpec/IdenticalEqualityAssertion: { Enabled: true }
+RSpec/MessageSpies: { Enabled: false }
+RSpec/MultipleExpectations: { Enabled: false }
+RSpec/MultipleMemoizedHelpers: { Enabled: false }
+RSpec/NamedSubject: { Enabled: false }
+RSpec/Rails/AvoidSetupHook: { Enabled: true }
+RSpec/Rails/HaveHttpStatus: { Enabled: true }
+RSpec/SubjectDeclaration: { Enabled: true }
+RSpec/SubjectStub: { Enabled: false }
+RSpec/VerifiedDoubleReference: { Enabled: true }
+
+Metrics/AbcSize: { Max: 40 }
+Metrics/BlockLength: { Enabled: false }
+Metrics/ClassLength: { Enabled: false }
+Metrics/CyclomaticComplexity: { Enabled: false }
+Metrics/MethodLength: { Max: 30 }
+Metrics/PerceivedComplexity: { Enabled: false }
+
+Naming/BlockForwarding: { Enabled: true }
+Naming/MethodParameterName: { MinNameLength: 1 }
+
+Security/CompoundHash: { Enabled: true }
+Security/IoMethods: { Enabled: true }
+
+Style/ArgumentsForwarding: { Enabled: true }
+Style/CollectionCompact: { Enabled: true }
+Style/DocumentDynamicEvalDefinition: { Enabled: false }
+Style/Documentation: { Enabled: false }
+Style/EmptyHeredoc: { Enabled: true }
+Style/EmptyMethod: { EnforcedStyle: expanded }
+Style/EndlessMethod: { Enabled: true }
+Style/ExplicitBlockArgument: { Enabled: false }
+Style/EnvHome: { Enabled: true }
+Style/FetchEnvVar: { Enabled: true }
+Style/FileRead: { Enabled: true }
+Style/FileWrite: { Enabled: true }
+Style/FrozenStringLiteralComment: { Enabled: true, EnforcedStyle: always }
+Style/GuardClause: { Enabled: false }
+Style/HashConversion: { Enabled: true }
+Style/HashEachMethods: { Enabled: true }
+Style/HashExcept: { Enabled: true }
+Style/HashTransformKeys: { Enabled: false }
+Style/HashTransformValues: { Enabled: false }
+Style/IfUnlessModifier: { Enabled: false }
+Style/IfWithBooleanLiteralBranches: { Enabled: true }
+Style/InPatternThen: { Enabled: true }
+Style/MapCompactWithConditionalBlock: { Enabled: true }
+Style/MapToHash: { Enabled: true }
+Style/MultilineInPatternThen: { Enabled: true }
+Style/NegatedIfElseCondition: { Enabled: true }
+Style/NestedFileDirname: { Enabled: true }
+Style/NilLambda: { Enabled: true }
+Style/NumberedParameters: { Enabled: true }
+Style/NumberedParametersLimit: { Enabled: true }
+Style/ObjectThen: { Enabled: true }
+Style/OpenStructUse: { Enabled: true }
+Style/QuotedSymbols: { Enabled: true }
+Style/RedundantArgument: { Enabled: true }
+Style/RedundantInitialize: { Enabled: true }
+Style/RedundantSelfAssignmentBranch: { Enabled: true }
+Style/SelectByRegexp: { Enabled: true }
+Style/StringChars: { Enabled: true }
+Style/SwapValues: { Enabled: true }
