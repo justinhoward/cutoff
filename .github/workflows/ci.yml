@@ -40,6 +40,8 @@ jobs:
         if: matrix.ruby == '2.7'
         with:
           files: coverage/coverage.xml
+      - run: bin/yardoc --fail-on-warning
+        if: matrix.ruby == '2.7'
       - run: bin/check-version
 
   release:

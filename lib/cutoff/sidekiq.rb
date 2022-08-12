@@ -3,6 +3,7 @@
 require 'sidekiq'
 
 class Cutoff
+  # Cutoff sidekiq extensions
   module Sidekiq
     # Add an option `cutoff` for sidekiq workers
     #

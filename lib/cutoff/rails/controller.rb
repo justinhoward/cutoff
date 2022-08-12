@@ -3,6 +3,7 @@
 require 'action_controller'
 
 class Cutoff
+  # Cutoff Rails extensions
   module Rails
     # Rails controller integration
     module Controller
@@ -45,4 +46,9 @@ class Cutoff
   end
 end
 
-ActionController::Base.extend(Cutoff::Rails::Controller)
+# @api external
+module ActionController
+  class Base
+    extend Cutoff::Rails::Controller
+  end
+end
