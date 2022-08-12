@@ -17,7 +17,8 @@ Gem::Specification.new do |spec|
   rubydoc = 'https://www.rubydoc.info/gems'
   spec.metadata = {
     'changelog_uri' => "#{spec.homepage}/blob/master/CHANGELOG.md",
-    'documentation_uri' => "#{rubydoc}/#{spec.name}/#{spec.version}"
+    'documentation_uri' => "#{rubydoc}/#{spec.name}/#{spec.version}",
+    'rubygems_mfa_required' => 'true'
   }
 
   spec.files = Dir['lib/**/*.rb', '*.md', '*.txt', '.yardopts']
@@ -25,10 +26,7 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = '>= 2.3'
 
-  # 0.81 is the last rubocop version with Ruby 2.3 support
   spec.add_development_dependency 'rspec', '~> 3.10'
   spec.add_development_dependency 'rspec-rails', '~> 5.0'
-  spec.add_development_dependency 'rubocop', '0.81.0'
-  spec.add_development_dependency 'rubocop-rspec', '1.38.1'
   spec.add_development_dependency 'timecop', '>= 0.9', '< 1.0'
 end

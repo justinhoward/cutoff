@@ -30,14 +30,14 @@ RSpec.describe Cutoff do
     Timecop.freeze
     cutoff = described_class.new(3)
     Timecop.freeze(4)
-    expect(cutoff.exceeded?).to eq(true)
+    expect(cutoff.exceeded?).to be(true)
   end
 
   it 'is not #exceeded? if there is time remaining' do
     Timecop.freeze
     cutoff = described_class.new(3)
     Timecop.freeze(2)
-    expect(cutoff.exceeded?).to eq(false)
+    expect(cutoff.exceeded?).to be(false)
   end
 
   it 'passes checkpoint if there is time remaining' do
@@ -122,16 +122,16 @@ RSpec.describe Cutoff do
   it 'does not advance timer when disabled' do
     Timecop.freeze
     cutoff = described_class.new(3)
-    Cutoff.disable!
+    described_class.disable!
     Timecop.freeze(4)
     expect(cutoff.elapsed_seconds).to eq(0)
     expect(cutoff.seconds_remaining).to eq(3)
   end
 
   it 'reports if it is disabled' do
-    expect(Cutoff.disabled?).to eq(false)
-    Cutoff.disable!
-    expect(Cutoff.disabled?).to eq(true)
+    expect(described_class.disabled?).to be(false)
+    described_class.disable!
+    expect(described_class.disabled?).to be(true)
   end
 
   describe 'class methods' do
@@ -241,7 +241,7 @@ RSpec.describe Cutoff do
       expect(Process).to receive(:clock_gettime)
         .with(Process::CLOCK_MONOTONIC)
 
-      Cutoff.now
+      described_class.now
     end
 
     context 'when CLOCK_MONOTONIC is not available' do
@@ -254,7 +254,7 @@ RSpec.describe Cutoff do
 
       it 'gets Concurrent.monotonic_time if available' do
         expect(Concurrent).to receive(:monotonic_time)
-        Cutoff.now
+        described_class.now
       end
     end
 
@@ -271,7 +271,7 @@ RSpec.describe Cutoff do
 
       it 'gets Time.now' do
         expect(Time).to receive(:now)
-        Cutoff.now
+        described_class.now
       end
     end
   end

@@ -18,7 +18,7 @@ RSpec.describe Cutoff::Rails::Controller, type: :controller do
   end
 
   context 'with no cutoff' do
-    controller(base_controller) {}
+    controller(base_controller) {} # rubocop:disable Lint/EmptyBlock
 
     it 'does nothing at checkpoint' do
       get :index, params: { duration: 10 }
@@ -37,12 +37,12 @@ RSpec.describe Cutoff::Rails::Controller, type: :controller do
     end
   end
 
-  context 'controller subclass' do
+  context 'with controller subclass' do
     parent = Class.new(base_controller) do
       cutoff 5
     end
 
-    controller(parent) {}
+    controller(parent) {} # rubocop:disable Lint/EmptyBlock
 
     it 'uses cutoff of the parent' do
       expect do
@@ -51,7 +51,7 @@ RSpec.describe Cutoff::Rails::Controller, type: :controller do
     end
   end
 
-  context 'controller subclass with longer cutoff' do
+  context 'with controller subclass with longer cutoff' do
     parent = Class.new(base_controller) do
       cutoff 5
     end
@@ -65,7 +65,7 @@ RSpec.describe Cutoff::Rails::Controller, type: :controller do
     end
   end
 
-  context 'controller subclass with shorter cutoff' do
+  context 'with controller subclass with shorter cutoff' do
     parent = Class.new(base_controller) do
       cutoff 5
     end
@@ -79,7 +79,7 @@ RSpec.describe Cutoff::Rails::Controller, type: :controller do
     end
   end
 
-  context 'controller with multiple cutoff calls' do
+  context 'with controller with multiple cutoff calls' do
     controller(base_controller) do
       cutoff 3
       cutoff 5
