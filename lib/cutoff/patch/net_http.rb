@@ -8,16 +8,20 @@ class Cutoff
     # to the remaining cutoff time. You can select this patch with
     # `exclude` or `only` using the checkpoint name `:net_http`.
     module NetHttp
-      def self.gen_timeout_method(name)
-        <<~RUBY
-          if #{name}.nil? || #{name} > remaining
-            self.#{name} = cutoff.seconds_remaining
-          end
-        RUBY
-      end
+      class << self
+        private
 
-      def self.use_write_timeout?
-        Gem::Version.new(RUBY_VERSION) > Gem::Version.new('2.6')
+        def gen_timeout_method(name)
+          <<~RUBY
+            if #{name}.nil? || #{name} > remaining
+              self.#{name} = cutoff.seconds_remaining
+            end
+          RUBY
+        end
+
+        def use_write_timeout?
+          Gem::Version.new(RUBY_VERSION) > Gem::Version.new('2.6')
+        end
       end
 
       # Same as the original start, but adds a checkpoint for starting HTTP
@@ -42,4 +46,9 @@ class Cutoff
   end
 end
 
-Net::HTTP.prepend(Cutoff::Patch::NetHttp)
+# @api external
+module Net
+  class HTTP
+    prepend Cutoff::Patch::NetHttp
+  end
+end

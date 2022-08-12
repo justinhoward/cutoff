@@ -1,6 +1,7 @@
 # frozen_string_literal:true
 
 class Cutoff
+  # Tracks the current time for cutoff
   module Timer
     if defined?(Process::CLOCK_MONOTONIC)
       # The current relative time

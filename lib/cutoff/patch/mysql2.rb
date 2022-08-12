@@ -167,4 +167,9 @@ class Cutoff
   end
 end
 
-Mysql2::Client.prepend(Cutoff::Patch::Mysql2)
+# @api external
+module Mysql2
+  class Client
+    prepend Cutoff::Patch::Mysql2
+  end
+end
