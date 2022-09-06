@@ -25,7 +25,7 @@ class Cutoff
       # @yield the next middleware in the chain or worker `perform` method
       # @return [void]
       def call(_worker, job, _queue)
-        allowed_seconds = job["cutoff"]
+        allowed_seconds = job['cutoff']
         return yield if allowed_seconds.nil?
 
         Cutoff.wrap(allowed_seconds) { yield }
