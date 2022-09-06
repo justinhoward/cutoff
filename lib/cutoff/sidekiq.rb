@@ -18,14 +18,14 @@ class Cutoff
     #     end
     #   end
     class ServerMiddleware
-      # @param worker [Object] the worker instance
-      # @param _job [Hash] the full job payload
+      # @param _worker [Object] the worker instance
+      # @param job [Hash] the full job payload
       # @param _queue [String] queue the name of the queue the job was pulled
       #   from
       # @yield the next middleware in the chain or worker `perform` method
       # @return [void]
-      def call(worker, _job, _queue)
-        allowed_seconds = worker.class.sidekiq_options['cutoff']
+      def call(_worker, job, _queue)
+        allowed_seconds = job["cutoff"]
         return yield if allowed_seconds.nil?
 
         Cutoff.wrap(allowed_seconds) { yield }
