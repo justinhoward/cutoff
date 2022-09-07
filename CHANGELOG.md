@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.1] - 2022-09-06
+
+### Changed
+
+- Upgrade rubocop to latest version #12 justinhoward
+- Add codecov.io code coverage #11 justinhoward
+- Complete yard documentation and fix warnings #13 justinhoward
+
+### Fixed
+
+- Pull cutoff option from job, not worker #14 mperham
+
 ## [0.5.0] - 2022-08-10
 
 ### Changed
@@ -58,7 +70,8 @@ to `Timeout::Error`. `CutoffError` changes from a class to a module.
 - Cutoff class
 - Mysql2 patch
 
-[Unreleased]: https://github.com/justinhoward/cutoff/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/justinhoward/cutoff/compare/v0.5.1...HEAD
+[0.5.1]: https://github.com/justinhoward/cutoff/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/justinhoward/cutoff/compare/v0.4.2...v0.5.0
 [0.4.2]: https://github.com/justinhoward/cutoff/compare/v0.4.1...v0.4.2
 [0.4.1]: https://github.com/justinhoward/cutoff/compare/v0.4.0...v0.4.1
