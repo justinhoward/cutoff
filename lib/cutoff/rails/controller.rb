@@ -47,8 +47,6 @@ class Cutoff
 end
 
 # @api external
-module ActionController
-  class Base
-    extend Cutoff::Rails::Controller
-  end
+ActiveSupport.on_load(:action_controller_base) do
+  ActionController::Base.extend(Cutoff::Rails::Controller)
 end
