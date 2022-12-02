@@ -22,7 +22,7 @@ require 'cutoff'
 require 'cutoff/patch/net_http'
 
 require 'timecop'
-require 'rails'
+require 'rails/all'
 require 'rspec/rails'
 require 'sidekiq/testing'
 
