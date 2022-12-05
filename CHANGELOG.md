@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.2] - 2022-09-06
+
+### Changed
+
+- Switch http URLs in specs to https #15 justinhoward
+- Switch CI to support jruby and truffleruby head #18 justinhoward
+
+### Added
+
+- Add Rails 6 support #17 maksymst
+
 ## [0.5.1] - 2022-09-06
 
 ### Changed
@@ -70,7 +81,8 @@ to `Timeout::Error`. `CutoffError` changes from a class to a module.
 - Cutoff class
 - Mysql2 patch
 
-[Unreleased]: https://github.com/justinhoward/cutoff/compare/v0.5.1...HEAD
+[Unreleased]: https://github.com/justinhoward/cutoff/compare/v0.5.2...HEAD
+[0.5.2]: https://github.com/justinhoward/cutoff/compare/v0.5.1...v0.5.2
 [0.5.1]: https://github.com/justinhoward/cutoff/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/justinhoward/cutoff/compare/v0.4.2...v0.5.0
 [0.4.2]: https://github.com/justinhoward/cutoff/compare/v0.4.1...v0.4.2
