@@ -1,35 +1,28 @@
 ---
 name: CI
+
 on:
   push:
     tags: ['v*']
     branches: [master]
   pull_request:
     branches: ['**']
+
 jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        ruby: [2.5, 2.6, 2.7, 3.0, jruby-head, truffleruby-head]
-        bundler: [default]
-        include:
-          - ruby: '2.3'
-            bundler: '1'
-          - ruby: '2.4'
-            bundler: '1'
+        ruby: ['2.3', '2.4', '2.5', '2.6', '2.7', '3.0', jruby-head, truffleruby-head]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: ruby/setup-ruby@v1
         env:
           REDIS_VERSION: ${{ matrix.redis }}
         with:
           ruby-version: ${{ matrix.ruby }}
-          bundler: ${{ matrix.bundler }}
           bundler-cache: true
-      - run: bundle exec rubocop
-        if: matrix.ruby == '2.7'
       - name: start MySQL
         run: sudo /etc/init.d/mysql start
       - run: bundle exec rspec --format doc
@@ -37,19 +30,55 @@ jobs:
           MYSQL_USER: root
           MYSQL_PASSWORD: root
       - uses: codecov/codecov-action@v3
-        if: matrix.ruby == '2.7'
+        if: matrix.ruby == '3.0'
         with:
           files: coverage/coverage.xml
+      - run: bin/check-version
+
+  rubocop:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '2.7'
+          bundler-cache: true
+      - run: bundle exec rubocop
+
+  yard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.0'
+          bundler-cache: true
       - run: bin/yardoc --fail-on-warning
-        if: matrix.ruby == '2.7'
+
+  check_version:
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.0'
+          bundler-cache: true
       - run: bin/check-version
 
   release:
-    needs: test
+    needs: [test, rubocop, yard, check_version]
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: dawidd6/action-publish-gem@v1
-        with:
-          api_key: ${{secrets.RUBYGEMS_API_KEY}}
+      - uses: actions/checkout@v3
+      - name: Publish to RubyGems
+        run: |
+          mkdir -p $HOME/.gem
+          touch $HOME/.gem/credentials
+          chmod 0600 $HOME/.gem/credentials
+          printf -- "---\n:rubygems_api_key: ${GEM_HOST_API_KEY}\n" > $HOME/.gem/credentials
+          gem build *.gemspec
+          gem push *.gem
+        env:
+          GEM_HOST_API_KEY: "${{secrets.RUBYGEMS_API_KEY}}"
