@@ -24,7 +24,7 @@ Gem::Specification.new do |spec|
   spec.files = Dir['lib/**/*.rb', '*.md', '*.txt', '.yardopts']
   spec.require_paths = ['lib']
 
-  spec.required_ruby_version = '>= 2.3'
+  spec.required_ruby_version = '>= 3.1'
 
   spec.add_development_dependency 'rspec', '~> 3.10'
   spec.add_development_dependency 'rspec-rails', '~> 5.0'
