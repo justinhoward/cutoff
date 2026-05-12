@@ -71,4 +71,61 @@ RSpec.describe Cutoff::Patch::NetHttp do
     expect(Net::HTTP.get_response(URI.parse('https://example.com')).code)
       .to eq('200')
   end
+
+  describe "Net::HTTP's internal retry of idempotent requests" do
+    # Establishes the upstream behavior the cutoff patch is guarding against:
+    # Net::HTTP#transport_request silently retries idempotent requests
+    # (default max_retries: 1) on Net::ReadTimeout and other transient errors,
+    # which can effectively double the deadline a caller set on the request.
+    it 'normally retries the request once on Net::ReadTimeout' do
+      uri = URI.parse('https://example.com')
+      Net::HTTP.start(uri.host, uri.port) do |http|
+        req = Net::HTTP::Get.new('/')
+        attempts = 0
+        allow(req).to receive(:exec) do
+          attempts += 1
+          raise Net::ReadTimeout
+        end
+
+        expect { http.request(req) }.to raise_error(Net::ReadTimeout)
+        expect(attempts).to eq(2)
+      end
+    end
+
+    it 'tightens read_timeout on each retry as the cutoff is consumed' do
+      Timecop.freeze
+      Cutoff.start(10)
+      uri = URI.parse('https://example.com')
+      Net::HTTP.start(uri.host, uri.port) do |http|
+        req = Net::HTTP::Get.new('/')
+        timeouts = []
+        allow(req).to receive(:exec) do
+          timeouts << http.read_timeout
+          Timecop.freeze(4)
+          raise Net::ReadTimeout
+        end
+
+        expect { http.request(req) }.to raise_error(Net::ReadTimeout)
+        expect(timeouts).to eq([10, 6])
+      end
+    end
+
+    it 'short-circuits the retry with CutoffExceededError when the cutoff is exhausted' do
+      Timecop.freeze
+      Cutoff.start(5)
+      uri = URI.parse('https://example.com')
+      Net::HTTP.start(uri.host, uri.port) do |http|
+        req = Net::HTTP::Get.new('/')
+        attempts = 0
+        allow(req).to receive(:exec) do
+          attempts += 1
+          Timecop.freeze(10)
+          raise Net::ReadTimeout
+        end
+
+        expect { http.request(req) }.to raise_error(Cutoff::CutoffExceededError)
+        expect(attempts).to eq(1)
+      end
+    end
+  end
 end
