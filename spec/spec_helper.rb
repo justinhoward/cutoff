@@ -27,11 +27,7 @@ require 'rspec/rails'
 require 'sidekiq/testing'
 
 begin
-  # We don't test Mysql2 on Ruby 2.3 since that would require
-  # installing an old EOL version of OpenSSL
-  if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.4')
-    require 'cutoff/patch/mysql2'
-  end
+  require 'cutoff/patch/mysql2'
 rescue LoadError
   # Ok if mysql2 isn't available
 end

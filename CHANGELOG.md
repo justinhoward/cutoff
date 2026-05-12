@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-05-12
+
+This release marks Cutoff's API as stable. There are no behavior changes
+since 0.5.2.
+
+### Breaking
+
+- Drop support for Ruby < 3.1. The minimum supported Ruby is now 3.1.
+  `required_ruby_version` in the gemspec has been raised accordingly. #21
+  justinhoward
+
+### Changed
+
+- Modernize CI matrix to Ruby 3.1, 3.2, 3.3, 3.4, jruby-head, and
+  truffleruby-head, and update gem dependencies that had rotted out of
+  CI in the interim. #21 justinhoward
+
 ## [0.5.2] - 2022-09-06
 
 ### Changed
@@ -81,7 +98,8 @@ to `Timeout::Error`. `CutoffError` changes from a class to a module.
 - Cutoff class
 - Mysql2 patch
 
-[Unreleased]: https://github.com/justinhoward/cutoff/compare/v0.5.2...HEAD
+[Unreleased]: https://github.com/justinhoward/cutoff/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/justinhoward/cutoff/compare/v0.5.2...v1.0.0
 [0.5.2]: https://github.com/justinhoward/cutoff/compare/v0.5.1...v0.5.2
 [0.5.1]: https://github.com/justinhoward/cutoff/compare/v0.5.0...v0.5.1
 [0.5.0]: https://github.com/justinhoward/cutoff/compare/v0.4.2...v0.5.0

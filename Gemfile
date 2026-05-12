@@ -8,10 +8,9 @@ gemspec
 # here. This also allows us to use conditional dependencies that depend on the
 # platform
 
-not_jruby = %i[ruby mingw x64_mingw].freeze
+not_jruby = %i[ruby windows].freeze
 
 gem 'actionpack'
-gem 'bundler', '>= 1.17', '< 3'
 gem 'byebug', platforms: not_jruby
 gem 'irb', '~> 1.0'
 # Minimum of 0.5.0 for specific error classes
@@ -25,9 +24,11 @@ gem 'yard', '~> 0.9.25', platforms: not_jruby
 
 gem 'concurrent-ruby'
 
-if Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.6')
-  gem 'rubocop', '1.34.1'
-  gem 'rubocop-rspec', '2.12'
-  gem 'simplecov', '~> 0.21.0'
-  gem 'simplecov-cobertura', '~> 2.1'
-end
+gem 'rubocop', '1.34.1'
+gem 'rubocop-rspec', '2.12'
+gem 'simplecov', '~> 0.21.0'
+gem 'simplecov-cobertura', '~> 3.1'
+
+# simplecov-cobertura crashes with REXML::ParseException: Malformed XML on
+# rexml >= 3.4.2. https://github.com/jessebs/simplecov-cobertura/issues/48
+gem 'rexml', '< 3.4.2'
