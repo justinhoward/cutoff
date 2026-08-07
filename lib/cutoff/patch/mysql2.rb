@@ -69,6 +69,8 @@ class Cutoff
             hint_comment
           elsif token.start_with?('/*')
             block_comment
+          elsif !@found_select && token.start_with?('(')
+            open_paren
           elsif token.match?(/^select/i)
             select
           else
@@ -133,6 +135,21 @@ class Cutoff
           @scanner.terminate
         end
 
+        def open_paren
+          # A statement can begin with a parenthesized query block, as in
+          # `(SELECT ...) UNION (SELECT ...)`. MySQL accepts an optimizer hint
+          # at the start of the first block and applies MAX_EXECUTION_TIME to
+          # the whole statement, so consume the parentheses and keep looking
+          # for the select.
+          #
+          # Go back to the beginning of the token and skip only the parens
+          # (and any whitespace after them) so the rest of the token is
+          # re-examined as its own token. This always advances the scanner by
+          # at least one character, so the token loop can't spin.
+          @scanner.unscan
+          @scanner.skip(/\(+\s*/)
+        end
+
         def select
           # If we encounter a select, we're ready to place our hint comment
           @scanner.unscan
@@ -140,7 +157,7 @@ class Cutoff
 
           # Make sure our word is actually select
           # We only checked that it starts with select before
-          return other unless word.casecmp('select')
+          return other unless word.casecmp?('select')
 
           @found_select = true
           @hint_pos = @scanner.pos

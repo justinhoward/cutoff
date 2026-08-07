@@ -149,5 +149,84 @@ RSpec.describe 'Cutoff::Patch::Mysql2', if: defined?(Mysql2) do
       expect(query.to_s)
         .to eq('SELECT/*+ MAX_EXECUTION_TIME(3) */ * FROM users')
     end
+
+    it 'inserts a hint into a parenthesized select' do
+      query = described_class.new('(SELECT * FROM users)', 3)
+      expect(query.to_s).to eq(
+        '(SELECT /*+ MAX_EXECUTION_TIME(3) */ * FROM users)'
+      )
+    end
+
+    it 'inserts a hint into the first block of a parenthesized union' do
+      query = described_class.new(
+        '(SELECT id FROM users) UNION (SELECT id FROM admins) ORDER BY id', 3
+      )
+      expect(query.to_s).to eq(
+        '(SELECT /*+ MAX_EXECUTION_TIME(3) */ id FROM users) ' \
+        'UNION (SELECT id FROM admins) ORDER BY id'
+      )
+    end
+
+    it 'inserts a hint into a select nested in multiple parens' do
+      query = described_class.new('((SELECT * FROM users))', 3)
+      expect(query.to_s).to eq(
+        '((SELECT /*+ MAX_EXECUTION_TIME(3) */ * FROM users))'
+      )
+    end
+
+    it 'inserts a hint when the paren is separated by whitespace' do
+      query = described_class.new('( SELECT * FROM users )', 3)
+      expect(query.to_s).to eq(
+        '( SELECT /*+ MAX_EXECUTION_TIME(3) */ * FROM users )'
+      )
+    end
+
+    it 'inserts a hint into a parenthesized select with an inner comment' do
+      query = described_class.new('(/* hi */ SELECT * FROM users)', 3)
+      expect(query.to_s).to eq(
+        '(/* hi */ SELECT /*+ MAX_EXECUTION_TIME(3) */ * FROM users)'
+      )
+    end
+
+    it 'inserts a hint into a parenthesized select after a comment' do
+      query = described_class.new('/* hi */ (SELECT * FROM users)', 3)
+      expect(query.to_s).to eq(
+        '/* hi */ (SELECT /*+ MAX_EXECUTION_TIME(3) */ * FROM users)'
+      )
+    end
+
+    it 'inserts a hint after a smushed parenthesized select*' do
+      query = described_class.new('(SELECT* FROM users)', 3)
+      expect(query.to_s).to eq(
+        '(SELECT/*+ MAX_EXECUTION_TIME(3) */ * FROM users)'
+      )
+    end
+
+    it 'inserts a hint into a parenthesized select with an existing hint' do
+      query = described_class.new('(SELECT /*+ ANOTHER_HINT */ 1)', 3)
+      expect(query.to_s).to eq(
+        '(SELECT /*+ ANOTHER_HINT MAX_EXECUTION_TIME(3) */ 1)'
+      )
+    end
+
+    it 'does nothing to a parenthesized non-select query block' do
+      query = described_class.new('(VALUES ROW(1), ROW(2))', 3)
+      expect(query.to_s).to eq('(VALUES ROW(1), ROW(2))')
+    end
+
+    it 'does nothing to an unterminated paren' do
+      query = described_class.new('( ', 3)
+      expect(query.to_s).to eq('( ')
+    end
+
+    it 'does nothing to a word that merely starts with select' do
+      query = described_class.new('SELECTX 1 FROM users', 3)
+      expect(query.to_s).to eq('SELECTX 1 FROM users')
+    end
+
+    it 'does nothing to a select-prefixed identifier' do
+      query = described_class.new('selections FROM t', 3)
+      expect(query.to_s).to eq('selections FROM t')
+    end
   end
 end
