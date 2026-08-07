@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-08-07
+
+### Fixed
+
+- The Mysql2 patch now finds the first `SELECT` when a statement begins with a
+  parenthesized query block, as in `(SELECT ...) UNION (SELECT ...)`.
+  Previously the leading `(` was treated as an unrecognized token and the
+  parser bailed out, so `MAX_EXECUTION_TIME` was silently never inserted and
+  the query ran with no server-side ceiling. MySQL applies a hint in the first
+  query block to the whole statement, so these queries are now capped
+  correctly.
+- Fixed a check in the Mysql2 patch that used `String#casecmp` where a boolean
+  was expected. Because `casecmp` returns `0` for a match (which is truthy in
+  Ruby), the guard never fired and any leading token merely *starting with*
+  `select` (such as `selections`) had a hint comment spliced into it,
+  producing invalid SQL. It now uses `casecmp?`.
+
+### Upgrading
+
+Queries beginning with a parenthesized query block were previously never given
+a `MAX_EXECUTION_TIME` hint, so they ran unbounded on the server even with an
+active cutoff. They are now capped, which means a query that used to slowly
+succeed may instead raise `Mysql2::Error`. That is the intended behavior of the
+patch, but it can surface as new errors on upgrade. If you have queries in this
+shape, check that their callers handle the error, or give them a longer cutoff.
+
+Statements beginning with `WITH` (common table expressions) are still not
+given a hint.
+
 ## [1.1.0] - 2026-05-12
 
 ### Fixed
@@ -107,7 +136,8 @@ to `Timeout::Error`. `CutoffError` changes from a class to a module.
 - Cutoff class
 - Mysql2 patch
 
-[Unreleased]: https://github.com/justinhoward/cutoff/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/justinhoward/cutoff/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/justinhoward/cutoff/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/justinhoward/cutoff/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/justinhoward/cutoff/compare/v0.5.2...v1.0.0
 [0.5.2]: https://github.com/justinhoward/cutoff/compare/v0.5.1...v0.5.2
